@@ -233,5 +233,5 @@ If you use this project in your research, please cite:
 - Federated Learning community
 
 ## Contact
-Your Name - your.email@example.com
+Your Name - bhushanasati25@gmail.com
 Project Link: [https://github.com/yourusername/project](https://github.com/yourusername/project)
