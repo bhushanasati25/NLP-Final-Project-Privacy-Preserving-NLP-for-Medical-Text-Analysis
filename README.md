@@ -234,4 +234,4 @@ If you use this project in your research, please cite:
 
 ## Contact
 Your Name - bhushanasati25@gmail.com
-Project Link: [[https://github.com/yourusername/project](https://github.com/bhushanasati25/NLP-Final-Project-Privacy-Preserving-NLP-for-Medical-Text-Analysis.git)]
+Project Link: [[https://github.com/bhushanasati25/](https://github.com/bhushanasati25/NLP-Final-Project-Privacy-Preserving-NLP-for-Medical-Text-Analysis.git)]
