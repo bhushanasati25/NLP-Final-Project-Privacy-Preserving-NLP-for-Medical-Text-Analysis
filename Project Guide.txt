@@ -1,0 +1,407 @@
+```markdown
+# Privacy-Preserving NLP Project - Complete Guide
+
+## Quick Start Guide
+
+```bash
+# 1. Clone repository
+git clone [your-repo-url]
+cd privacy-preserving-nlp
+
+# 2. Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# or
+venv\Scripts\activate  # Windows
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Run quick start script
+python quickstart.py
+```
+
+## Detailed Examples
+
+### 1. Data Processing Example
+
+```python
+from src.preprocessing.data_processor import DataPreprocessor
+from src.utils.config import ConfigLoader
+
+# Load configuration
+config = ConfigLoader('config/config.yaml')
+
+# Initialize preprocessor with specific parameters
+preprocessor = DataPreprocessor(
+    max_features=10000,
+    min_df=2,
+    max_df=0.95,
+    ngram_range=(1, 2)
+)
+
+# Process training data
+train_df = preprocessor.process_data(
+    data_path='data/raw/train_data.csv',
+    save_processed=True,
+    output_path='data/processed/train_processed.csv'
+)
+
+# Process test data
+test_df = preprocessor.process_data(
+    data_path='data/raw/test_data.csv',
+    save_processed=True,
+    output_path='data/processed/test_processed.csv'
+)
+
+# Get preprocessing statistics
+stats = preprocessor.get_preprocessing_stats()
+print("Preprocessing Statistics:", stats)
+```
+
+### 2. Federated Learning Setup Example
+
+```python
+from src.federated.client import FederatedClient
+from src.federated.server import FederatedServer
+from src.models.text_classifier import SimpleTextClassifier
+from src.federated.privacy import PrivacyMechanism
+
+# Initialize privacy mechanism
+privacy_mechanism = PrivacyMechanism(
+    epsilon=1.0,
+    delta=1e-5,
+    noise_multiplier=1.0
+)
+
+# Initialize model
+model = SimpleTextClassifier(
+    input_dim=10000,
+    hidden_dim=256,
+    output_dim=5,
+    dropout_rate=0.3
+)
+
+# Create server
+server = FederatedServer(
+    model=model,
+    num_clients=5,
+    privacy_mechanism=privacy_mechanism
+)
+
+# Initialize clients
+clients = []
+for i in range(5):
+    client = FederatedClient(
+        client_id=f"client_{i}",
+        model=model,
+        privacy_mechanism=privacy_mechanism,
+        learning_rate=0.001
+    )
+    clients.append(client)
+
+# Training loop
+for round_num in range(10):
+    # Client training
+    client_updates = []
+    for client in clients:
+        update = client.train(epochs=2, batch_size=32)
+        client_updates.append(update)
+    
+    # Server aggregation
+    server.aggregate_updates(client_updates)
+```
+
+### 3. Model Training with Privacy Example
+
+```python
+from src.models.loss import PrivacyAwareLoss
+from src.utils.metrics import MetricsTracker
+
+# Initialize loss function with privacy
+criterion = PrivacyAwareLoss(
+    base_criterion="cross_entropy",
+    epsilon=1.0,
+    delta=1e-5
+)
+
+# Initialize metrics tracker
+metrics_tracker = MetricsTracker()
+
+# Training loop with privacy
+def train_with_privacy(model, dataloader, criterion, optimizer, privacy_mechanism):
+    model.train()
+    for batch_idx, (data, target) in enumerate(dataloader):
+        optimizer.zero_grad()
+        
+        # Forward pass
+        output = model(data)
+        
+        # Compute loss with privacy
+        loss, privacy_cost = criterion(output, target)
+        
+        # Backward pass
+        loss.backward()
+        
+        # Add noise to gradients
+        privacy_mechanism.add_noise_to_gradients(model.parameters())
+        
+        optimizer.step()
+        
+        # Track metrics
+        metrics_tracker.update(
+            loss=loss.item(),
+            privacy_cost=privacy_cost
+        )
+```
+
+## Configuration Examples
+
+### 1. Basic Configuration (config/config.yaml)
+
+```yaml
+data:
+  raw_data_path: "data/raw/cord19_dataset.csv"
+  processed_data_path: "data/processed/"
+  train_test_split: 0.2
+  random_seed: 42
+
+preprocessing:
+  max_features: 10000
+  min_df: 2
+  max_df: 0.95
+  ngram_range: [1, 2]
+  remove_stopwords: true
+  lemmatization: true
+
+model:
+  input_dim: 10000
+  hidden_dim: 256
+  output_dim: 5
+  dropout_rate: 0.3
+
+federated:
+  num_clients: 5
+  num_rounds: 10
+  local_epochs: 2
+  batch_size: 32
+  privacy:
+    epsilon: 1.0
+    delta: 1e-5
+    noise_multiplier: 1.0
+```
+
+### 2. Advanced Configuration
+
+```yaml
+model:
+  architecture:
+    type: "transformer"
+    num_layers: 4
+    num_heads: 8
+    dim_feedforward: 1024
+    dropout: 0.1
+    activation: "gelu"
+
+optimization:
+  optimizer: "adam"
+  learning_rate: 0.001
+  weight_decay: 0.01
+  scheduler:
+    type: "cosine"
+    warmup_steps: 1000
+
+privacy:
+  mechanism: "gaussian"
+  epsilon: 1.0
+  delta: 1e-5
+  clip_norm: 1.0
+  noise_multiplier: 1.0
+  accountant: "rdp"
+
+federated:
+  aggregation_strategy: "fedavg"
+  min_clients_per_round: 3
+  client_sampling_rate: 0.8
+  communication:
+    compression: true
+    quantization_bits: 8
+```
+
+## Troubleshooting Guide
+
+### 1. CUDA/GPU Issues
+
+```python
+# Check CUDA availability
+import torch
+
+def check_gpu_status():
+    if torch.cuda.is_available():
+        print(f"CUDA available: {torch.cuda.is_available()}")
+        print(f"CUDA device count: {torch.cuda.device_count()}")
+        print(f"Current device: {torch.cuda.current_device()}")
+        print(f"Device name: {torch.cuda.get_device_name(0)}")
+    else:
+        print("CUDA not available, using CPU")
+
+# Set device
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+```
+
+### 2. Memory Issues
+
+```python
+def monitor_memory_usage():
+    import psutil
+    import nvidia_smi
+    
+    # CPU Memory
+    cpu_memory = psutil.Process().memory_info().rss / 1024 / 1024  # MB
+    print(f"CPU Memory Usage: {cpu_memory:.2f} MB")
+    
+    # GPU Memory
+    if torch.cuda.is_available():
+        nvidia_smi.nvmlInit()
+        handle = nvidia_smi.nvmlDeviceGetHandleByIndex(0)
+        info = nvidia_smi.nvmlDeviceGetMemoryInfo(handle)
+        print(f"GPU Memory: {info.used/1024/1024:.2f} MB")
+
+def optimize_memory():
+    # Clear CUDA cache
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+    
+    # Clear model gradients
+    model.zero_grad()
+    
+    # Use gradient checkpointing
+    model.use_checkpointing()
+```
+
+### 3. Data Loading Issues
+
+```python
+def check_data_integrity():
+    """Check for common data issues"""
+    try:
+        # Check file existence
+        if not os.path.exists(data_path):
+            raise FileNotFoundError(f"Data file not found: {data_path}")
+        
+        # Check file size
+        file_size = os.path.getsize(data_path) / (1024 * 1024)  # MB
+        if file_size == 0:
+            raise ValueError("Data file is empty")
+        
+        # Check data format
+        df = pd.read_csv(data_path)
+        required_columns = ['text', 'label']
+        missing_columns = [col for col in required_columns if col not in df.columns]
+        if missing_columns:
+            raise ValueError(f"Missing columns: {missing_columns}")
+        
+        # Check for null values
+        null_counts = df.isnull().sum()
+        if null_counts.any():
+            print("Warning: Found null values:")
+            print(null_counts[null_counts > 0])
+            
+        return True
+        
+    except Exception as e:
+        print(f"Data integrity check failed: {str(e)}")
+        return False
+```
+
+### 4. API/Deployment Issues
+
+```python
+def check_api_health():
+    """Check API server health"""
+    try:
+        response = requests.get('http://localhost:5000/health')
+        if response.status_code == 200:
+            print("API server is healthy")
+            return True
+        else:
+            print(f"API server returned status code: {response.status_code}")
+            return False
+    except requests.exceptions.ConnectionError:
+        print("Could not connect to API server")
+        return False
+
+def test_api_endpoints():
+    """Test all API endpoints"""
+    endpoints = {
+        'health': {'method': 'GET', 'data': None},
+        'predict': {'method': 'POST', 'data': {'text': 'test message'}}
+    }
+    
+    results = {}
+    for endpoint, config in endpoints.items():
+        try:
+            if config['method'] == 'GET':
+                response = requests.get(f'http://localhost:5000/{endpoint}')
+            else:
+                response = requests.post(
+                    f'http://localhost:5000/{endpoint}',
+                    json=config['data']
+                )
+            results[endpoint] = response.status_code == 200
+        except Exception as e:
+            results[endpoint] = False
+            print(f"Error testing {endpoint}: {str(e)}")
+    
+    return results
+```
+
+## Monitoring and Logging
+
+```python
+class ProjectMonitor:
+    def __init__(self):
+        self.logger = self._setup_logger()
+        self.metrics = MetricsTracker()
+    
+    def _setup_logger(self):
+        logger = logging.getLogger('project_monitor')
+        logger.setLevel(logging.INFO)
+        
+        # File handler
+        fh = logging.FileHandler('project_monitor.log')
+        fh.setLevel(logging.INFO)
+        
+        # Console handler
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.INFO)
+        
+        # Formatter
+        formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        )
+        fh.setFormatter(formatter)
+        ch.setFormatter(formatter)
+        
+        logger.addHandler(fh)
+        logger.addHandler(ch)
+        
+        return logger
+    
+    def monitor_training(self, model, metrics):
+        self.logger.info("Monitoring training progress...")
+        self.metrics.update(metrics)
+        self.metrics.plot()
+        
+        # Memory monitoring
+        self.monitor_memory_usage()
+        
+        # Model checkpointing
+        if self.should_checkpoint(metrics):
+            self.save_checkpoint(model, metrics)
+    
+    def monitor_privacy(self, privacy_metrics):
+        self.logger.info("Monitoring privacy budget...")
+        if privacy_metrics['privacy_budget_spent'] > privacy_metrics['privacy_budget']:
+            self.logger.warning("Privacy budget exceeded!")
+```
