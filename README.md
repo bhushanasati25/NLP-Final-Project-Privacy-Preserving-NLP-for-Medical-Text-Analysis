@@ -220,10 +220,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 If you use this project in your research, please cite:
 ```
 @software{privacy_preserving_nlp_fl,
-  author = {Your Name},
+  author = {Bhushan Asati},
   title = {Privacy-Preserving NLP through Federated Learning},
   year = {2024},
-  url = {https://github.com/yourusername/project}
+  url = {https://github.com/bhushanasati25/}
 }
 ```
 
