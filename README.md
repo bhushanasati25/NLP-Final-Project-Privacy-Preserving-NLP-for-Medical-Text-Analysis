@@ -220,7 +220,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 If you use this project in your research, please cite:
 ```
 @software{privacy_preserving_nlp_fl,
-  author = {Bhushan Asati},
+  author = {Bhushan Asati, Suyash Madhavi},
   title = {Privacy-Preserving NLP through Federated Learning},
   year = {2024},
   url = {https://github.com/bhushanasati25/}
@@ -230,8 +230,8 @@ If you use this project in your research, please cite:
 ## Acknowledgments
 - CORD-19 dataset providers
 - PyTorch team
-- Federated Learning community
+- Federated Learning Community
 
 ## Contact
-Your Name - bhushanasati25@gmail.com
+Name - Bhushan Asati, Suyash Madhavi
 Project Link: [[https://github.com/bhushanasati25/](https://github.com/bhushanasati25/NLP-Final-Project-Privacy-Preserving-NLP-for-Medical-Text-Analysis.git)]
